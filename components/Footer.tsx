@@ -72,7 +72,16 @@ export default function Footer() {
                         © {currentYear} iVoteForIt. All rights reserved.
                     </p>
                     <p className="text-gray-500 text-sm mt-2">
-                        Developed by www.fassiltsegaye.com & ❤️
+                        Developed by{' '}
+                        <a
+                            href="https://www.fassiltsegaye.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-800 hover:underline font-semibold"
+                        >
+                            www.fassiltsegaye.com
+                        </a>
+                        {' '}& ❤️
                     </p>
                 </div>
             </div>
