@@ -24,6 +24,7 @@ export default function Header() {
                     </Link>
 
                     {/* Desktop Menu */}
+                    {/* Desktop Menu */}
                     <nav className="hidden md:flex items-center gap-6">
                         <Link
                             href="/"
@@ -39,9 +40,15 @@ export default function Header() {
                         </Link>
                         <Link
                             href="/admin"
+                            className="font-bold hover:text-blue-200 transition"
+                        >
+                            QR Code
+                        </Link>
+                        <Link
+                            href="/admin/manage"
                             className="bg-white text-blue-600 px-4 py-2 rounded-lg font-bold hover:bg-blue-50 transition"
                         >
-                            Admin
+                            Manage
                         </Link>
                     </nav>
 
