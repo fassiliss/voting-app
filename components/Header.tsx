@@ -9,7 +9,7 @@ export default function Header() {
                     <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
                         <div className="bg-white rounded-full p-1">
                             <Image
-                                src="/grace-logo.png"
+                                src="/logo.png"
                                 alt="Grace Church Logo"
                                 width={60}
                                 height={60}
