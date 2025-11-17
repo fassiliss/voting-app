@@ -17,6 +17,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
     title: "iVoteForIt - Secure Digital Voting",
     description: "Secure, transparent, and easy digital voting platform with QR code support",
+    icons: {
+        icon: '/logo.png',
+        apple: '/logo.png',
+    },
 };
 
 export default function RootLayout({
