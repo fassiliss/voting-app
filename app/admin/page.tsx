@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import QRCode from 'qrcode';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 export default function AdminQRPage() {
+    useAdminAuth();
     const [qrCodeUrl, setQrCodeUrl] = useState('');
     const [votingUrl, setVotingUrl] = useState('');
 

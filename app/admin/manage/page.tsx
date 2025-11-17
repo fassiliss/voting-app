@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 interface Candidate {
     id: number;
@@ -11,6 +12,7 @@ interface Candidate {
 }
 
 export default function ManageCandidatesPage() {
+    useAdminAuth();
     const [candidates, setCandidates] = useState<Candidate[]>([]);
     const [newName, setNewName] = useState('');
     const [newPosition, setNewPosition] = useState('');
