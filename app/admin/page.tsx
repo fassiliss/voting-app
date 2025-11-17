@@ -16,7 +16,8 @@ export default function AdminQRPage() {
         const sessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
 
         // Create voting URL with session
-        const url = `http://10.0.0.195:3004?session=${sessionId}`;
+        // Use current domain (works for both localhost and production)
+        const url = `${window.location.origin}?session=${sessionId}`;
         setVotingUrl(url);
 
         // Generate QR code

@@ -21,11 +21,18 @@ export default function VotingPage() {
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
     const router = useRouter();
+    const [deviceFingerprint, setDeviceFingerprint] = useState<string>('');
 
     useEffect(() => {
         fetchCandidates();
     }, []);
-
+    useEffect(() => {
+        // Get device fingerprint only on client side
+        if (typeof window !== 'undefined') {
+            const fp = getDeviceFingerprint();
+            setDeviceFingerprint(fp);
+        }
+    }, []);
     const fetchCandidates = async () => {
         const { data, error } = await supabase
             .from('candidates')
@@ -46,14 +53,17 @@ export default function VotingPage() {
             return;
         }
 
-        // Get device fingerprint
-        const deviceFp = getDeviceFingerprint();
+        // Make sure we have device fingerprint
+        if (!deviceFingerprint) {
+            setError('Unable to verify device. Please refresh and try again.');
+            return;
+        }
 
         // Check if this device has already voted
         const { data: deviceCheck } = await supabase
             .from('voters')
             .select('*')
-            .eq('device_fingerprint', deviceFp)
+            .eq('device_fingerprint', deviceFingerprint)
             .eq('has_voted', true)
             .single();
 
@@ -79,7 +89,7 @@ export default function VotingPage() {
             // Update existing voter with device fingerprint
             await supabase
                 .from('voters')
-                .update({ device_fingerprint: deviceFp })
+                .update({ device_fingerprint: deviceFingerprint })
                 .eq('id', existingVoter.id);
 
             setVoterId(existingVoter.id);
@@ -90,7 +100,7 @@ export default function VotingPage() {
                 .insert([{
                     voter_name: voterName,
                     voter_email: voterEmail,
-                    device_fingerprint: deviceFp
+                    device_fingerprint: deviceFingerprint
                 }])
                 .select()
                 .single();
