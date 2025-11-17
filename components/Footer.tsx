@@ -13,7 +13,7 @@ export default function Footer() {
                         <div className="flex items-center gap-3 mb-4">
                             <div className="bg-white rounded-full p-1">
                                 <Image
-                                    src="/grace-logo.png"
+                                    src="/logo.png"
                                     alt="Grace Church Logo"
                                     width={50}
                                     height={50}
