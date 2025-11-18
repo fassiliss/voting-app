@@ -26,6 +26,11 @@ export default function ManageCandidatesPage() {
         fetchCandidates();
     }, []);
 
+    const handleLogout = () => {
+        sessionStorage.removeItem('adminAuth');
+        window.location.href = '/admin/login';
+    };
+
     const fetchCandidates = async () => {
         const { data } = await supabase
             .from('candidates')
@@ -113,12 +118,22 @@ export default function ManageCandidatesPage() {
         <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 py-12 px-4">
             <div className="max-w-6xl mx-auto">
                 <div className="bg-white rounded-lg shadow-xl p-8 mb-8">
-                    <h1 className="text-4xl font-bold text-center mb-2 text-black">
-                        Manage Candidates
-                    </h1>
-                    <p className="text-center text-gray-700 mb-6 font-semibold">
-                        Add, edit, or delete candidates for your election
-                    </p>
+                    <div className="flex justify-between items-center mb-6">
+                        <div>
+                            <h1 className="text-4xl font-bold text-black">
+                                Manage Candidates
+                            </h1>
+                            <p className="text-gray-700 font-semibold">
+                                Add, edit, or delete candidates for your election
+                            </p>
+                        </div>
+                        <button
+                            onClick={handleLogout}
+                            className="bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700"
+                        >
+                            🚪 Logout
+                        </button>
+                    </div>
 
                     {message && (
                         <div className={`p-4 rounded mb-6 font-semibold ${
@@ -249,7 +264,7 @@ export default function ManageCandidatesPage() {
                     </div>
 
                     {/* Navigation */}
-                    <div className="mt-8 flex gap-4 justify-center">
+                    <div className="mt-8 flex flex-wrap gap-4 justify-center">
                         <Link
                             href="/admin"
                             className="bg-purple-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-purple-700"
