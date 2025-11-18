@@ -13,6 +13,7 @@ interface Candidate {
 
 export default function ManageCandidatesPage() {
     useAdminAuth();
+    const [isLoading, setIsLoading] = useState(true);
     const [candidates, setCandidates] = useState<Candidate[]>([]);
     const [newName, setNewName] = useState('');
     const [newPosition, setNewPosition] = useState('');
@@ -23,7 +24,12 @@ export default function ManageCandidatesPage() {
     const [message, setMessage] = useState('');
 
     useEffect(() => {
-        fetchCandidates();
+        // Check if authenticated
+        const isAuth = sessionStorage.getItem('adminAuth');
+        if (isAuth) {
+            setIsLoading(false);
+            fetchCandidates();
+        }
     }, []);
 
     const handleLogout = () => {
@@ -113,6 +119,18 @@ export default function ManageCandidatesPage() {
             fetchCandidates();
         }
     };
+
+    // Loading screen while checking authentication
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="text-4xl font-bold text-blue-600 mb-4">Loading...</div>
+                    <p className="text-gray-600">Checking authentication</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 py-12 px-4">
