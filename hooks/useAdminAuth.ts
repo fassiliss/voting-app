@@ -10,7 +10,11 @@ export const useAdminAuth = () => {
         const isAuthenticated = sessionStorage.getItem('adminAuth');
 
         if (!isAuthenticated) {
-            router.push('/admin/login');
+            // Immediate redirect, no delay
+            router.replace('/admin/login');
         }
     }, [router]);
+
+    // Return auth status
+    return typeof window !== 'undefined' ? sessionStorage.getItem('adminAuth') === 'true' : false;
 };
