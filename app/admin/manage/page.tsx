@@ -5,6 +5,9 @@ import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
+// ⚙️ EASY TOGGLE: Set to false to disable password, true to require password
+const REQUIRE_PASSWORD = false;  // ← Change this to true to re-enable password
+
 interface Candidate {
     id: number;
     name: string;
@@ -12,7 +15,11 @@ interface Candidate {
 }
 
 export default function ManageCandidatesPage() {
-    useAdminAuth();
+    // Only use auth hook if password is required
+    if (REQUIRE_PASSWORD) {
+        useAdminAuth();
+    }
+
     const [isLoading, setIsLoading] = useState(true);
     const [candidates, setCandidates] = useState<Candidate[]>([]);
     const [newName, setNewName] = useState('');
@@ -24,17 +31,28 @@ export default function ManageCandidatesPage() {
     const [message, setMessage] = useState('');
 
     useEffect(() => {
-        // Check if authenticated
-        const isAuth = sessionStorage.getItem('adminAuth');
-        if (isAuth) {
+        if (REQUIRE_PASSWORD) {
+            // Check if authenticated
+            const isAuth = sessionStorage.getItem('adminAuth');
+            if (isAuth) {
+                setIsLoading(false);
+                fetchCandidates();
+            }
+        } else {
+            // Skip authentication - load directly
             setIsLoading(false);
             fetchCandidates();
         }
     }, []);
 
     const handleLogout = () => {
-        sessionStorage.removeItem('adminAuth');
-        window.location.href = '/admin/login';
+        if (REQUIRE_PASSWORD) {
+            sessionStorage.removeItem('adminAuth');
+            window.location.href = '/admin/login';
+        } else {
+            // Just go to home if no password required
+            window.location.href = '/';
+        }
     };
 
     const fetchCandidates = async () => {
@@ -166,12 +184,17 @@ export default function ManageCandidatesPage() {
                             <p className="text-gray-700 font-semibold">
                                 Add, edit, or delete candidates for your election
                             </p>
+                            {!REQUIRE_PASSWORD && (
+                                <p className="text-sm text-orange-600 mt-2 font-semibold">
+                                    ⚠️ Password protection disabled
+                                </p>
+                            )}
                         </div>
                         <button
                             onClick={handleLogout}
                             className="bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700"
                         >
-                            🚪 Logout
+                            {REQUIRE_PASSWORD ? '🚪 Logout' : '← Back'}
                         </button>
                     </div>
 
@@ -179,7 +202,9 @@ export default function ManageCandidatesPage() {
                         <div className={`p-4 rounded mb-6 font-semibold ${
                             message.includes('✅')
                                 ? 'bg-green-100 text-green-700'
-                                : 'bg-red-100 text-red-700'
+                                : message.includes('🔄')
+                                    ? 'bg-blue-100 text-blue-700'
+                                    : 'bg-red-100 text-red-700'
                         }`}>
                             {message}
                         </div>
@@ -296,11 +321,14 @@ export default function ManageCandidatesPage() {
                         <h2 className="text-2xl font-bold text-red-600 mb-4">⚠️ Danger Zone</h2>
                         <button
                             onClick={resetElection}
-                            className="bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700"
+                            disabled={loading}
+                            className="bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700 disabled:bg-gray-400"
                         >
-                            Reset Entire Election (Delete All Data)
+                            {loading ? '🔄 Resetting...' : '🗑️ Reset Entire Election (Delete All Data)'}
                         </button>
-                        <p className="text-sm text-gray-600 mt-2">This will delete all votes, voters, and candidates!</p>
+                        <p className="text-sm text-gray-600 mt-2">
+                            This will delete ALL votes, voters, and candidates! This action cannot be undone.
+                        </p>
                     </div>
 
                     {/* Navigation */}
