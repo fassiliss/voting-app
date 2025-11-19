@@ -26,7 +26,9 @@ export default function ResultsPage() {
     const [results, setResults] = useState<Result[]>([]);
     const [voters, setVoters] = useState<Voter[]>([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [totalVoters, setTotalVoters] = useState(0);
+    const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
     useEffect(() => {
         fetchResults();
@@ -52,8 +54,8 @@ export default function ResultsPage() {
             setTotalVoters(votersData?.length || 0);
             setVoters(votersData || []);
 
-            const resultsData: Result[] = candidates!.map((candidate) => {
-                const candidateVotes = allVotes!.filter(v => v.candidate_id === candidate.id);
+            const resultsData: Result[] = (candidates || []).map((candidate) => {
+                const candidateVotes = (allVotes || []).filter(v => v.candidate_id === candidate.id);
 
                 return {
                     candidate,
@@ -63,11 +65,18 @@ export default function ResultsPage() {
 
             resultsData.sort((a, b) => b.totalVotes - a.totalVotes);
             setResults(resultsData);
+            setLastRefresh(new Date());
         } catch (error) {
             console.error('Error fetching results:', error);
         } finally {
             setLoading(false);
+            setRefreshing(false);
         }
+    };
+
+    const handleRefresh = async () => {
+        setRefreshing(true);
+        await fetchResults();
     };
 
     if (loading) {
@@ -93,20 +102,44 @@ export default function ResultsPage() {
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-12 px-4">
             <div className="max-w-6xl mx-auto">
                 <div className="bg-white rounded-lg shadow-xl p-8 mb-8">
-                    <h1 className="text-4xl font-bold text-center mb-2 text-black">Voting Results</h1>
-                    <p className="text-center text-gray-900 mb-2 font-semibold text-lg">
-                        Total Voters: <span className="font-bold text-blue-600">{totalVoters}</span>
-                    </p>
-                    <p className="text-center text-gray-700 mb-8 font-medium">
-                        Ranked by total number of votes received
-                    </p>
+                    <div className="flex justify-between items-start mb-6">
+                        <div>
+                            <h1 className="text-4xl font-bold mb-2 text-black">Voting Results</h1>
+                            <p className="text-gray-900 mb-2 font-semibold text-lg">
+                                Total Voters: <span className="font-bold text-blue-600">{totalVoters}</span>
+                            </p>
+                            <p className="text-gray-700 font-medium">
+                                Ranked by total number of votes received
+                            </p>
+                            <p className="text-sm text-gray-500 mt-2">
+                                Last updated: {lastRefresh.toLocaleTimeString()}
+                            </p>
+                        </div>
+                        <button
+                            onClick={handleRefresh}
+                            disabled={refreshing}
+                            className="bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 disabled:bg-gray-400 flex items-center gap-2"
+                        >
+                            {refreshing ? (
+                                <>
+                                    <span className="animate-spin">🔄</span>
+                                    Refreshing...
+                                </>
+                            ) : (
+                                <>
+                                    🔄 Refresh Results
+                                </>
+                            )}
+                        </button>
+                    </div>
 
                     {results.length === 0 ? (
                         <div className="text-center py-12">
-                            <p className="text-xl text-gray-900 font-semibold">No votes yet!</p>
+                            <p className="text-xl text-gray-900 font-semibold mb-4">No votes yet!</p>
+                            <p className="text-gray-600 mb-6">Either no one has voted, or the election has been reset.</p>
                             <Link
                                 href="/"
-                                className="inline-block mt-4 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold"
+                                className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold"
                             >
                                 Go Vote
                             </Link>
@@ -188,6 +221,21 @@ export default function ResultsPage() {
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                )}
+
+                {voters.length === 0 && results.length === 0 && (
+                    <div className="bg-white rounded-lg shadow-xl p-8 text-center">
+                        <h2 className="text-2xl font-bold mb-4 text-gray-700">No Data Available</h2>
+                        <p className="text-gray-600 mb-4">
+                            The election appears to have been reset or no one has voted yet.
+                        </p>
+                        <button
+                            onClick={handleRefresh}
+                            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700"
+                        >
+                            🔄 Refresh to Check Again
+                        </button>
                     </div>
                 )}
             </div>

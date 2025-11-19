@@ -108,15 +108,37 @@ export default function ManageCandidatesPage() {
     const resetElection = async () => {
         if (!confirm('⚠️ This will DELETE ALL votes, voters, and candidates! Continue?')) return;
 
-        const { error: votesError } = await supabase.from('votes').delete().neq('id', 0);
-        const { error: votersError } = await supabase.from('voters').delete().neq('id', 0);
-        const { error: candidatesError } = await supabase.from('candidates').delete().neq('id', 0);
+        setLoading(true);
+        setMessage('🔄 Resetting election...');
 
-        if (votesError || votersError || candidatesError) {
-            setMessage('Error resetting election');
-        } else {
-            setMessage('✅ Election reset complete!');
-            fetchCandidates();
+        try {
+            const { error: votesError } = await supabase
+                .from('votes')
+                .delete()
+                .not('id', 'is', null);
+
+            const { error: votersError } = await supabase
+                .from('voters')
+                .delete()
+                .not('id', 'is', null);
+
+            const { error: candidatesError } = await supabase
+                .from('candidates')
+                .delete()
+                .not('id', 'is', null);
+
+            if (votesError || votersError || candidatesError) {
+                console.error('Errors:', { votesError, votersError, candidatesError });
+                setMessage('❌ Error: ' + (votesError?.message || votersError?.message || candidatesError?.message));
+            } else {
+                setMessage('✅ Election reset complete!');
+                setCandidates([]);
+            }
+        } catch (error) {
+            console.error('Reset failed:', error);
+            setMessage('❌ Reset failed');
+        } finally {
+            setLoading(false);
         }
     };
 
