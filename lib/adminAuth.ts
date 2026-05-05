@@ -12,6 +12,19 @@ function getSessionSecret() {
     return process.env.ADMIN_SESSION_SECRET || getAdminPassword();
 }
 
+export function getAllowedAdminEmails() {
+    return (process.env.ADMIN_EMAILS || '')
+        .split(',')
+        .map((email) => email.trim().toLowerCase())
+        .filter(Boolean);
+}
+
+export function isAdminEmailAllowed(email?: string | null) {
+    if (!email) return false;
+
+    return getAllowedAdminEmails().includes(email.trim().toLowerCase());
+}
+
 export function isAdminConfigured() {
     return hasStoredAdminPassword() || getAdminPassword().length >= 10;
 }

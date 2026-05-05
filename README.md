@@ -13,11 +13,14 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ADMIN_PASSWORD=use-a-long-unique-password
 ADMIN_SESSION_SECRET=use-a-long-random-secret
 ADMIN_RECOVERY_CODE=use-a-long-private-recovery-code
+ADMIN_EMAILS=admin@example.com
 ```
 
 `SUPABASE_SERVICE_ROLE_KEY` is recommended for protected admin routes. Keep it server-only and never prefix it with `NEXT_PUBLIC_`.
 
 If you forget the admin password, open `/admin/forgot-password` and use `ADMIN_RECOVERY_CODE` to create a new one. Reset passwords are stored as a local server-side hash in `.data/admin-password.json`, which is ignored by git.
+
+Google admin login requires Supabase Auth with the Google provider enabled. Add the admin Google account email address to `ADMIN_EMAILS`; separate multiple emails with commas.
 
 ## Development
 
