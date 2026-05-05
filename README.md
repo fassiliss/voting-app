@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# iVoteForIt
 
-## Getting Started
+A Next.js voting app with QR-code access, Supabase-backed candidates and votes, public results, and protected admin management.
 
-First, run the development server:
+## Setup
+
+Create `.env.local` with:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+ADMIN_PASSWORD=use-a-long-unique-password
+ADMIN_SESSION_SECRET=use-a-long-random-secret
+ADMIN_RECOVERY_CODE=use-a-long-private-recovery-code
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`SUPABASE_SERVICE_ROLE_KEY` is recommended for protected admin routes. Keep it server-only and never prefix it with `NEXT_PUBLIC_`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+If you forget the admin password, open `/admin/forgot-password` and use `ADMIN_RECOVERY_CODE` to create a new one. Reset passwords are stored as a local server-side hash in `.data/admin-password.json`, which is ignored by git.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Development
 
-## Learn More
+```bash
+npm install
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open [http://localhost:3000](http://localhost:3000).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Production Notes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Enable Supabase Row Level Security before going live. Public users should only be able to read candidates/results and submit their own vote through your intended policies. Admin-only table changes should stay behind the protected server routes in this app.

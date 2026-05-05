@@ -1,41 +1,54 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function AdminLoginPage() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError('');
+        setLoading(true);
 
-        // Set your admin password here
-        const ADMIN_PASSWORD = 'Grace2024!';
+        try {
+            const response = await fetch('/api/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password }),
+            });
+            const data = await response.json() as { error?: string };
 
-        if (password === ADMIN_PASSWORD) {
-            // Store in session
-            sessionStorage.setItem('adminAuth', 'true');
+            if (!response.ok) {
+                setError(data.error || 'Unable to sign in.');
+                setPassword('');
+                return;
+            }
+
             router.push('/admin/manage');
-        } else {
-            setError('Invalid password!');
-            setPassword('');
+        } catch {
+            setError('Unable to sign in right now. Please try again.');
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center px-4">
-            <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
-                <h1 className="text-4xl font-bold text-center mb-2 text-black">
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-12">
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 max-w-md w-full">
+                <h1 className="text-3xl font-bold text-center mb-2 text-slate-950">
                     Admin Login
                 </h1>
-                <p className="text-center text-gray-700 mb-8 font-semibold">
-                    Enter password to access admin panel
+                <p className="text-center text-slate-600 mb-8">
+                    Enter your admin password to manage this election.
                 </p>
 
                 {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 font-semibold">
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4 font-medium">
                         {error}
                     </div>
                 )}
@@ -48,10 +61,9 @@ export default function AdminLoginPage() {
                         <input
                             type="password"
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={(e) => setPassword(e.currentTarget.value)}
                             required
-                            className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-600 font-bold"
-                            style={{ color: '#000000' }}
+                            className="w-full px-4 py-3 border border-slate-300 rounded-md text-slate-950 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none"
                             placeholder="Enter admin password"
                             autoFocus
                         />
@@ -59,20 +71,27 @@ export default function AdminLoginPage() {
 
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold text-lg hover:bg-blue-700 transition"
+                        disabled={loading}
+                        className="w-full bg-blue-600 text-white py-3 rounded-md font-bold text-lg hover:bg-blue-700 transition disabled:bg-slate-400"
                     >
-                        Login
+                        {loading ? 'Signing in...' : 'Login'}
                     </button>
                 </form>
 
-                <div className="mt-6 text-center">
-                   <a
-                    href="/"
-                    className="text-blue-600 hover:underline font-semibold"
+                <div className="mt-6 flex flex-col gap-3 text-center">
+                    <Link
+                        href="/admin/forgot-password"
+                        className="text-blue-600 hover:underline font-semibold"
                     >
-                    ← Back to Voting
-                </a>
-            </div>
+                        Forgot password?
+                    </Link>
+                    <Link
+                        href="/"
+                        className="text-slate-600 hover:text-slate-950 hover:underline font-semibold"
+                    >
+                        Back to Voting
+                    </Link>
+                </div>
         </div>
 </div>
 );

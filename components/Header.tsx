@@ -4,7 +4,7 @@ import MobileMenu from './MobileMenu';
 
 export default function Header() {
     return (
-        <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
+        <header className="bg-slate-950 text-white shadow-sm">
             <div className="max-w-7xl mx-auto px-4 py-4">
                 <div className="flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
@@ -23,8 +23,6 @@ export default function Header() {
                         </div>
                     </Link>
 
-                    {/* Desktop Menu */}
-                    {/* Desktop Menu */}
                     <nav className="hidden md:flex items-center gap-6">
                         <Link
                             href="/"
@@ -46,7 +44,7 @@ export default function Header() {
                         </Link>
                         <Link
                             href="/admin/manage"
-                            className="bg-white text-blue-600 px-4 py-2 rounded-lg font-bold hover:bg-blue-50 transition"
+                            className="bg-white text-slate-950 px-4 py-2 rounded-md font-bold hover:bg-slate-100 transition"
                         >
                             Manage
                         </Link>
