@@ -46,32 +46,32 @@ export default function AdminQRPage() {
 
     if (isChecking || !isAuthenticated) {
         return (
-            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-                <div className="text-2xl font-bold text-slate-950">Checking access...</div>
+            <div className="min-h-screen app-page flex items-center justify-center">
+                <div className="text-2xl font-bold app-heading">Checking access...</div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 py-12 px-4">
+        <div className="min-h-screen app-page py-12 px-4">
             <div className="max-w-2xl mx-auto">
-                <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8">
-                    <h1 className="text-3xl font-bold text-center mb-2 text-slate-950">
+                <div className="app-panel rounded-lg p-8">
+                    <h1 className="text-3xl font-bold text-center mb-2 app-heading">
                         Voting QR Code
                     </h1>
-                    <p className="text-center text-slate-600 mb-8">
+                    <p className="text-center app-muted mb-8">
                         Scan this QR code to open the voting page.
                     </p>
 
                     {qrCodeUrl && (
                         <div className="flex flex-col items-center gap-6">
-                            <div className="bg-white p-6 rounded-lg border border-slate-200">
+                            <div className="app-panel p-6 rounded-lg">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={qrCodeUrl} alt="Voting QR Code" className="w-full max-w-md" />
                             </div>
 
                             <div className="text-center">
-                                <p className="text-sm text-slate-600 mb-2">Or use this link:</p>
+                                <p className="text-sm app-muted mb-2">Or use this link:</p>
                                 <a
                                 href={votingUrl}
                                 target="_blank"

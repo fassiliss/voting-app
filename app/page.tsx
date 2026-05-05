@@ -186,13 +186,13 @@ export default function VotingPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 py-10 px-4">
+        <div className="min-h-screen app-page py-10 px-4">
             <div className="max-w-4xl mx-auto">
 
                 {step === 'login' && (
-                    <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 md:p-8">
-                        <h1 className="text-3xl font-bold text-center mb-2 text-slate-950">Voting System</h1>
-                        <p className="text-center text-slate-600 mb-8">Enter your details to begin.</p>
+                    <div className="app-panel rounded-lg p-6 md:p-8">
+                        <h1 className="text-3xl font-bold text-center mb-2 app-heading">Voting System</h1>
+                        <p className="text-center app-muted mb-8">Enter your details to begin.</p>
 
                         {error && (
                             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4 font-medium">
@@ -202,7 +202,7 @@ export default function VotingPage() {
 
                         <form onSubmit={handleLogin} className="space-y-6">
                             <div>
-                                <label className="block font-bold mb-2 text-slate-950" htmlFor="voter-name">Full Name *</label>
+                                <label className="block font-bold mb-2 app-heading" htmlFor="voter-name">Full Name *</label>
                                 <input
                                     id="voter-name"
                                     type="text"
@@ -210,13 +210,13 @@ export default function VotingPage() {
                                     onChange={(e) => setVoterName(e.currentTarget.value)}
                                     required
                                     maxLength={120}
-                                    className="w-full px-4 py-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none text-slate-950 bg-white"
+                                    className="w-full px-4 py-3 app-input rounded-md focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none"
                                     placeholder="Enter your name"
                                 />
                             </div>
 
                             <div>
-                                <label className="block font-bold mb-2 text-slate-950" htmlFor="voter-email">Email *</label>
+                                <label className="block font-bold mb-2 app-heading" htmlFor="voter-email">Email *</label>
                                 <input
                                     id="voter-email"
                                     type="email"
@@ -224,7 +224,7 @@ export default function VotingPage() {
                                     onChange={(e) => setVoterEmail(e.currentTarget.value)}
                                     required
                                     maxLength={160}
-                                    className="w-full px-4 py-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none text-slate-950 bg-white"
+                                    className="w-full px-4 py-3 app-input rounded-md focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none"
                                     placeholder="your@email.com"
                                 />
                             </div>
@@ -240,9 +240,9 @@ export default function VotingPage() {
                 )}
 
                 {step === 'vote' && (
-                    <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 md:p-8">
-                        <h1 className="text-3xl font-bold text-center mb-2 text-slate-950">Select Your Candidate</h1>
-                        <p className="text-center mb-8 text-slate-600">
+                    <div className="app-panel rounded-lg p-6 md:p-8">
+                        <h1 className="text-3xl font-bold text-center mb-2 app-heading">Select Your Candidate</h1>
+                        <p className="text-center mb-8 app-muted">
                             Choose one candidate and submit your vote.
                         </p>
 
@@ -259,8 +259,8 @@ export default function VotingPage() {
                                     key={candidate.id}
                                     className={`w-full text-left flex items-center gap-4 p-5 border rounded-lg transition ${
                                         selectedCandidateId === candidate.id
-                                            ? 'border-blue-500 bg-blue-50'
-                                            : 'border-slate-200 bg-white hover:border-blue-400'
+                                            ? 'border-blue-500 app-subpanel'
+                                            : 'app-panel hover:border-blue-400'
                                     }`}
                                     onClick={() => handleCandidateSelect(candidate.id)}
                                 >
@@ -272,8 +272,8 @@ export default function VotingPage() {
                                         className="w-6 h-6 cursor-pointer"
                                     />
                                     <div className="flex-1">
-                                        <h3 className="text-2xl font-bold text-slate-950">{candidate.name}</h3>
-                                        <p className="text-slate-600 font-medium">{candidate.position || 'Candidate'}</p>
+                                        <h3 className="text-2xl font-bold app-heading">{candidate.name}</h3>
+                                        <p className="app-muted font-medium">{candidate.position || 'Candidate'}</p>
                                     </div>
                                     {selectedCandidateId === candidate.id && (
                                         <div className="text-blue-600 font-bold">Selected</div>

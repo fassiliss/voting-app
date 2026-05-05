@@ -104,12 +104,12 @@ export default function AdminLoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-12">
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 max-w-md w-full">
-                <h1 className="text-3xl font-bold text-center mb-2 text-slate-950">
+        <div className="min-h-screen app-page flex items-center justify-center px-4 py-12">
+            <div className="app-panel rounded-lg p-8 max-w-md w-full">
+                <h1 className="text-3xl font-bold text-center mb-2 app-heading">
                     Admin Login
                 </h1>
-                <p className="text-center text-slate-600 mb-8">
+                <p className="text-center app-muted mb-8">
                     Sign in to manage this election.
                 </p>
 
@@ -123,7 +123,7 @@ export default function AdminLoginPage() {
                     type="button"
                     onClick={handleGoogleLogin}
                     disabled={googleLoading || loading}
-                    className="w-full border border-slate-300 bg-white text-slate-950 py-3 rounded-md font-bold text-lg hover:bg-slate-50 transition disabled:bg-slate-100 disabled:text-slate-500"
+                    className="w-full app-input py-3 rounded-md font-bold text-lg hover:opacity-90 transition disabled:opacity-60"
                 >
                     {googleLoading ? 'Connecting to Google...' : 'Continue with Google'}
                 </button>
@@ -136,7 +136,7 @@ export default function AdminLoginPage() {
 
                 <form onSubmit={handleLogin} className="space-y-5">
                     <div>
-                        <label className="block font-bold mb-2 text-slate-950" htmlFor="admin-email">
+                        <label className="block font-bold mb-2 app-heading" htmlFor="admin-email">
                             Email
                         </label>
                         <input
@@ -144,14 +144,14 @@ export default function AdminLoginPage() {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.currentTarget.value)}
-                            className="w-full px-4 py-3 border border-slate-300 rounded-md text-slate-950 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none"
+                            className="w-full px-4 py-3 app-input rounded-md focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none"
                             placeholder="you@example.com"
                             autoComplete="email"
                         />
                     </div>
 
                     <div>
-                        <label className="block font-bold mb-2 text-slate-950" htmlFor="admin-password">
+                        <label className="block font-bold mb-2 app-heading" htmlFor="admin-password">
                             Password
                         </label>
                         <input
@@ -160,7 +160,7 @@ export default function AdminLoginPage() {
                             value={password}
                             onChange={(e) => setPassword(e.currentTarget.value)}
                             required
-                            className="w-full px-4 py-3 border border-slate-300 rounded-md text-slate-950 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none"
+                            className="w-full px-4 py-3 app-input rounded-md focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none"
                             placeholder="••••••••"
                             autoComplete="current-password"
                             autoFocus
@@ -188,7 +188,7 @@ export default function AdminLoginPage() {
                 <div className="mt-6 text-center">
                     <Link
                         href="/"
-                        className="text-slate-600 hover:text-slate-950 hover:underline font-semibold"
+                        className="app-muted hover:opacity-80 hover:underline font-semibold"
                     >
                         Back to Voting
                     </Link>

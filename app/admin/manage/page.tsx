@@ -166,23 +166,23 @@ export default function ManageCandidatesPage() {
 
     if (isChecking || !isAuthenticated) {
         return (
-            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+            <div className="min-h-screen app-page flex items-center justify-center">
                 <div className="text-center">
-                    <div className="text-2xl font-bold text-slate-950 mb-2">Checking access...</div>
-                    <p className="text-slate-600">Please wait a moment.</p>
+                    <div className="text-2xl font-bold app-heading mb-2">Checking access...</div>
+                    <p className="app-muted">Please wait a moment.</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 py-10 px-4">
+        <div className="min-h-screen app-page py-10 px-4">
             <div className="max-w-6xl mx-auto space-y-6">
-                <section className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 md:p-8">
+                <section className="app-panel rounded-lg p-6 md:p-8">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                         <div>
-                            <h1 className="text-3xl font-bold text-slate-950">Manage Candidates</h1>
-                            <p className="text-slate-600 mt-1">Add, edit, or remove candidates for this election.</p>
+                            <h1 className="text-3xl font-bold app-heading">Manage Candidates</h1>
+                            <p className="app-muted mt-1">Add, edit, or remove candidates for this election.</p>
                         </div>
                         <button
                             onClick={handleLogout}
@@ -202,11 +202,11 @@ export default function ManageCandidatesPage() {
                         </div>
                     )}
 
-                    <form onSubmit={addCandidate} className="bg-slate-50 p-5 rounded-lg border border-slate-200 mb-8">
-                        <h2 className="text-xl font-bold text-slate-950 mb-4">Add Candidate</h2>
+                    <form onSubmit={addCandidate} className="app-subpanel p-5 rounded-lg mb-8">
+                        <h2 className="text-xl font-bold app-heading mb-4">Add Candidate</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div>
-                                <label className="block font-bold mb-2 text-slate-950" htmlFor="new-name">Name *</label>
+                                <label className="block font-bold mb-2 app-heading" htmlFor="new-name">Name *</label>
                                 <input
                                     id="new-name"
                                     type="text"
@@ -214,19 +214,19 @@ export default function ManageCandidatesPage() {
                                     onChange={(e) => setNewName(e.currentTarget.value)}
                                     required
                                     maxLength={120}
-                                    className="w-full px-4 py-3 border border-slate-300 rounded-md text-slate-950 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none"
+                                    className="w-full px-4 py-3 app-input rounded-md focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none"
                                     placeholder="Candidate name"
                                 />
                             </div>
                             <div>
-                                <label className="block font-bold mb-2 text-slate-950" htmlFor="new-position">Position/Title</label>
+                                <label className="block font-bold mb-2 app-heading" htmlFor="new-position">Position/Title</label>
                                 <input
                                     id="new-position"
                                     type="text"
                                     value={newPosition}
                                     onChange={(e) => setNewPosition(e.currentTarget.value)}
                                     maxLength={120}
-                                    className="w-full px-4 py-3 border border-slate-300 rounded-md text-slate-950 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none"
+                                    className="w-full px-4 py-3 app-input rounded-md focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none"
                                     placeholder="Candidate, President, Board Member"
                                 />
                             </div>
@@ -241,15 +241,15 @@ export default function ManageCandidatesPage() {
                     </form>
 
                     <div className="space-y-3">
-                        <h2 className="text-xl font-bold text-slate-950">Current Candidates ({candidates.length})</h2>
+                        <h2 className="text-xl font-bold app-heading">Current Candidates ({candidates.length})</h2>
 
                         {candidates.length === 0 ? (
-                            <p className="text-slate-600 text-center py-8 border border-dashed border-slate-300 rounded-lg">
+                            <p className="app-muted text-center py-8 border border-dashed rounded-lg">
                                 No candidates yet. Add the first candidate above.
                             </p>
                         ) : (
                             candidates.map((candidate) => (
-                                <div key={candidate.id} className="bg-white p-4 rounded-lg border border-slate-200">
+                                <div key={candidate.id} className="app-panel p-4 rounded-lg">
                                     {editingId === candidate.id ? (
                                         <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-3">
                                             <input
@@ -257,20 +257,20 @@ export default function ManageCandidatesPage() {
                                                 value={editName}
                                                 onChange={(e) => setEditName(e.currentTarget.value)}
                                                 maxLength={120}
-                                                className="px-4 py-3 border border-slate-300 rounded-md text-slate-950"
+                                                className="px-4 py-3 app-input rounded-md"
                                             />
                                             <input
                                                 type="text"
                                                 value={editPosition}
                                                 onChange={(e) => setEditPosition(e.currentTarget.value)}
                                                 maxLength={120}
-                                                className="px-4 py-3 border border-slate-300 rounded-md text-slate-950"
+                                                className="px-4 py-3 app-input rounded-md"
                                             />
                                             <div className="flex gap-2">
                                                 <button onClick={saveEdit} className="bg-green-600 text-white px-4 py-2 rounded-md font-bold hover:bg-green-700">
                                                     Save
                                                 </button>
-                                                <button onClick={() => setEditingId(null)} className="bg-slate-200 text-slate-950 px-4 py-2 rounded-md font-bold hover:bg-slate-300">
+                                                <button onClick={() => setEditingId(null)} className="app-input px-4 py-2 rounded-md font-bold hover:opacity-90">
                                                     Cancel
                                                 </button>
                                             </div>
@@ -278,8 +278,8 @@ export default function ManageCandidatesPage() {
                                     ) : (
                                         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                                             <div>
-                                                <h3 className="text-xl font-bold text-slate-950">{candidate.name}</h3>
-                                                <p className="text-slate-600 font-medium">{candidate.position || 'Candidate'}</p>
+                                                <h3 className="text-xl font-bold app-heading">{candidate.name}</h3>
+                                                <p className="app-muted font-medium">{candidate.position || 'Candidate'}</p>
                                             </div>
                                             <div className="flex gap-2">
                                                 <button onClick={() => startEdit(candidate)} className="bg-blue-600 text-white px-4 py-2 rounded-md font-bold hover:bg-blue-700">
@@ -297,9 +297,9 @@ export default function ManageCandidatesPage() {
                     </div>
                 </section>
 
-                <section className="bg-white rounded-lg border border-red-200 shadow-sm p-6 md:p-8">
+                <section className="app-panel rounded-lg border-red-300 p-6 md:p-8">
                     <h2 className="text-xl font-bold text-red-700 mb-2">Danger Zone</h2>
-                    <p className="text-slate-600 mb-4">Resetting deletes all votes, voters, and candidates.</p>
+                    <p className="app-muted mb-4">Resetting deletes all votes, voters, and candidates.</p>
                     <button
                         onClick={resetElection}
                         disabled={loading}
@@ -310,7 +310,7 @@ export default function ManageCandidatesPage() {
                 </section>
 
                 <nav className="flex flex-wrap gap-3 justify-center">
-                    <Link href="/admin" className="bg-slate-900 text-white px-5 py-3 rounded-md font-bold hover:bg-slate-700">
+                    <Link href="/admin" className="app-input px-5 py-3 rounded-md font-bold hover:opacity-90">
                         Generate QR Code
                     </Link>
                     <Link href="/results" className="bg-green-600 text-white px-5 py-3 rounded-md font-bold hover:bg-green-700">

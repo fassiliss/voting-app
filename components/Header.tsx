@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import MobileMenu from './MobileMenu';
+import ThemeToggle from './ThemeToggle';
 
 export default function Header() {
     return (
-        <header className="bg-slate-950 text-white shadow-sm">
+        <header className="app-header text-white shadow-sm">
             <div className="max-w-7xl mx-auto px-4 py-4">
                 <div className="flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
@@ -44,14 +45,17 @@ export default function Header() {
                         </Link>
                         <Link
                             href="/admin/manage"
-                            className="bg-white text-slate-950 px-4 py-2 rounded-md font-bold hover:bg-slate-100 transition"
+                            className="nav-cta"
                         >
                             Manage
                         </Link>
+                        <ThemeToggle />
                     </nav>
 
-                    {/* Mobile Menu */}
-                    <MobileMenu />
+                    <div className="flex md:hidden items-center gap-2">
+                        <ThemeToggle />
+                        <MobileMenu />
+                    </div>
                 </div>
             </div>
         </header>

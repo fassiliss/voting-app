@@ -45,12 +45,12 @@ export default function ForgotAdminPasswordPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-12">
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 max-w-md w-full">
-                <h1 className="text-3xl font-bold text-center mb-2 text-slate-950">
+        <div className="min-h-screen app-page flex items-center justify-center px-4 py-12">
+            <div className="app-panel rounded-lg p-8 max-w-md w-full">
+                <h1 className="text-3xl font-bold text-center mb-2 app-heading">
                     Reset Admin Password
                 </h1>
-                <p className="text-center text-slate-600 mb-8">
+                <p className="text-center app-muted mb-8">
                     Use your private recovery code to create a new admin password.
                 </p>
 
@@ -62,7 +62,7 @@ export default function ForgotAdminPasswordPage() {
 
                 <form onSubmit={handleReset} className="space-y-5">
                     <div>
-                        <label className="block font-bold mb-2 text-slate-950" htmlFor="recovery-code">
+                        <label className="block font-bold mb-2 app-heading" htmlFor="recovery-code">
                             Recovery Code
                         </label>
                         <input
@@ -71,14 +71,14 @@ export default function ForgotAdminPasswordPage() {
                             value={recoveryCode}
                             onChange={(e) => setRecoveryCode(e.currentTarget.value)}
                             required
-                            className="w-full px-4 py-3 border border-slate-300 rounded-md text-slate-950 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none"
+                            className="w-full px-4 py-3 app-input rounded-md focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none"
                             placeholder="Enter recovery code"
                             autoFocus
                         />
                     </div>
 
                     <div>
-                        <label className="block font-bold mb-2 text-slate-950" htmlFor="new-password">
+                        <label className="block font-bold mb-2 app-heading" htmlFor="new-password">
                             New Password
                         </label>
                         <input
@@ -88,13 +88,13 @@ export default function ForgotAdminPasswordPage() {
                             onChange={(e) => setNewPassword(e.currentTarget.value)}
                             required
                             minLength={10}
-                            className="w-full px-4 py-3 border border-slate-300 rounded-md text-slate-950 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none"
+                            className="w-full px-4 py-3 app-input rounded-md focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none"
                             placeholder="At least 10 characters"
                         />
                     </div>
 
                     <div>
-                        <label className="block font-bold mb-2 text-slate-950" htmlFor="confirm-password">
+                        <label className="block font-bold mb-2 app-heading" htmlFor="confirm-password">
                             Confirm New Password
                         </label>
                         <input
@@ -104,7 +104,7 @@ export default function ForgotAdminPasswordPage() {
                             onChange={(e) => setConfirmPassword(e.currentTarget.value)}
                             required
                             minLength={10}
-                            className="w-full px-4 py-3 border border-slate-300 rounded-md text-slate-950 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none"
+                            className="w-full px-4 py-3 app-input rounded-md focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none"
                             placeholder="Repeat new password"
                         />
                     </div>

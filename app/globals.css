@@ -1,8 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --surface: #ffffff;
+  --surface-muted: #f1f5f9;
+  --border: #e2e8f0;
+  --text-muted: #475569;
+  --header: #020617;
+  --header-soft: #0f172a;
+  --input: #ffffff;
+  --input-border: #cbd5e1;
+  --shadow: 0 1px 2px rgb(15 23 42 / 0.08);
+}
+
+:root[data-theme="dark"] {
+  --background: #080b12;
+  --foreground: #f8fafc;
+  --surface: #111827;
+  --surface-muted: #0f172a;
+  --border: #263244;
+  --text-muted: #cbd5e1;
+  --header: #020617;
+  --header-soft: #111827;
+  --input: #0b1220;
+  --input-border: #334155;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.35);
 }
 
 @theme inline {
@@ -12,15 +35,90 @@
   --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.app-page {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.app-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.app-subpanel {
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+}
+
+.app-heading {
+  color: var(--foreground);
+}
+
+.app-muted {
+  color: var(--text-muted);
+}
+
+.app-input {
+  background: var(--input);
+  border: 1px solid var(--input-border);
+  color: var(--foreground);
+}
+
+.app-input::placeholder {
+  color: color-mix(in srgb, var(--text-muted) 70%, transparent);
+}
+
+.result-gold {
+  background: #fffbeb;
+  border-color: #fcd34d;
+}
+
+.result-bronze {
+  background: #fff7ed;
+  border-color: #fdba74;
+}
+
+:root[data-theme="dark"] .result-gold {
+  background: #2b2208;
+  border-color: #92400e;
+}
+
+:root[data-theme="dark"] .result-bronze {
+  background: #2b1608;
+  border-color: #9a3412;
+}
+
+.app-header {
+  background: var(--header);
+}
+
+.nav-cta,
+.theme-toggle {
+  background: var(--surface);
+  color: var(--foreground);
+  border-radius: 6px;
+  font-weight: 700;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.nav-cta {
+  padding: 0.5rem 1rem;
+}
+
+.theme-toggle {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+}
+
+.nav-cta:hover,
+.theme-toggle:hover {
+  background: var(--surface-muted);
 }
