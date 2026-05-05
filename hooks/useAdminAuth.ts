@@ -1,20 +1,42 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export const useAdminAuth = () => {
     const router = useRouter();
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isChecking, setIsChecking] = useState(true);
 
     useEffect(() => {
-        const isAuthenticated = sessionStorage.getItem('adminAuth');
+        let cancelled = false;
 
-        if (!isAuthenticated) {
-            // Immediate redirect, no delay
-            router.replace('/admin/login');
+        async function checkSession() {
+            try {
+                const response = await fetch('/api/admin/session');
+                const data = await response.json() as { authenticated?: boolean };
+
+                if (cancelled) return;
+
+                if (!data.authenticated) {
+                    router.replace('/admin/login');
+                    return;
+                }
+
+                setIsAuthenticated(true);
+            } catch {
+                if (!cancelled) router.replace('/admin/login');
+            } finally {
+                if (!cancelled) setIsChecking(false);
+            }
         }
+
+        checkSession();
+
+        return () => {
+            cancelled = true;
+        };
     }, [router]);
 
-    // Return auth status
-    return typeof window !== 'undefined' ? sessionStorage.getItem('adminAuth') === 'true' : false;
+    return { isAuthenticated, isChecking };
 };

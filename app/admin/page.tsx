@@ -1,19 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 export default function AdminQRPage() {
-    useAdminAuth();
+    const { isAuthenticated, isChecking } = useAdminAuth();
     const [qrCodeUrl, setQrCodeUrl] = useState('');
     const [votingUrl, setVotingUrl] = useState('');
 
-    useEffect(() => {
-        generateQRCode();
-    }, []);
-
-    const generateQRCode = async () => {
+    const generateQRCode = useCallback(async () => {
         // Generate unique session ID
         const sessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
 
@@ -36,27 +32,46 @@ export default function AdminQRPage() {
         } catch (err) {
             console.error('Error generating QR code:', err);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        if (!isAuthenticated) return;
+
+        const timer = window.setTimeout(() => {
+            generateQRCode();
+        }, 0);
+
+        return () => window.clearTimeout(timer);
+    }, [generateQRCode, isAuthenticated]);
+
+    if (isChecking || !isAuthenticated) {
+        return (
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+                <div className="text-2xl font-bold text-slate-950">Checking access...</div>
+            </div>
+        );
+    }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 py-12 px-4">
+        <div className="min-h-screen bg-slate-50 py-12 px-4">
             <div className="max-w-2xl mx-auto">
-                <div className="bg-white rounded-lg shadow-xl p-8">
-                    <h1 className="text-4xl font-bold text-center mb-2 text-black">
+                <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8">
+                    <h1 className="text-3xl font-bold text-center mb-2 text-slate-950">
                         Voting QR Code
                     </h1>
-                    <p className="text-center text-gray-700 mb-8 font-semibold">
-                        Scan this QR code to vote
+                    <p className="text-center text-slate-600 mb-8">
+                        Scan this QR code to open the voting page.
                     </p>
 
                     {qrCodeUrl && (
                         <div className="flex flex-col items-center gap-6">
-                            <div className="bg-white p-6 rounded-lg border-4 border-blue-500">
+                            <div className="bg-white p-6 rounded-lg border border-slate-200">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={qrCodeUrl} alt="Voting QR Code" className="w-full max-w-md" />
                             </div>
 
                             <div className="text-center">
-                                <p className="text-sm text-gray-600 mb-2">Or use this link:</p>
+                                <p className="text-sm text-slate-600 mb-2">Or use this link:</p>
                                 <a
                                 href={votingUrl}
                                 target="_blank"
@@ -69,16 +84,16 @@ export default function AdminQRPage() {
 
                         <button
                         onClick={generateQRCode}
-                     className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+                     className="bg-blue-600 text-white px-6 py-3 rounded-md font-semibold hover:bg-blue-700 transition"
                 >
                     Generate New QR Code
                 </button>
 
                 <button
                     onClick={() => window.print()}
-                    className="bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition"
+                    className="bg-slate-900 text-white px-6 py-3 rounded-md font-semibold hover:bg-slate-700 transition"
                 >
-                    🖨️ Print QR Code
+                    Print QR Code
                 </button>
             </div>
             )}

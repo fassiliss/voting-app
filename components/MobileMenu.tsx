@@ -12,7 +12,8 @@ export default function MobileMenu() {
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="text-white p-2"
-                aria-label="Menu"
+                aria-label={isOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={isOpen}
             >
                 <svg
                     className="w-6 h-6"
@@ -40,33 +41,33 @@ export default function MobileMenu() {
 
             {/* Mobile Menu Dropdown */}
             {isOpen && (
-                <div className="absolute top-20 left-0 right-0 bg-blue-700 shadow-lg z-50">
+                <div className="absolute top-20 left-0 right-0 bg-slate-900 shadow-lg z-50">
                     <nav className="flex flex-col p-4 space-y-4">
                         <Link
                             href="/"
                             onClick={() => setIsOpen(false)}
-                            className="text-white font-bold py-2 px-4 rounded hover:bg-blue-600"
+                            className="text-white font-bold py-2 px-4 rounded hover:bg-slate-800"
                         >
                             Vote
                         </Link>
                         <Link
                             href="/results"
                             onClick={() => setIsOpen(false)}
-                            className="text-white font-bold py-2 px-4 rounded hover:bg-blue-600"
+                            className="text-white font-bold py-2 px-4 rounded hover:bg-slate-800"
                         >
                             Results
                         </Link>
                         <Link
                             href="/admin"
                             onClick={() => setIsOpen(false)}
-                            className="text-white font-bold py-2 px-4 rounded hover:bg-blue-600"
+                            className="text-white font-bold py-2 px-4 rounded hover:bg-slate-800"
                         >
                             QR Code
                         </Link>
                         <Link
                             href="/admin/manage"
                             onClick={() => setIsOpen(false)}
-                            className="text-white font-bold py-2 px-4 rounded hover:bg-blue-600"
+                            className="text-white font-bold py-2 px-4 rounded hover:bg-slate-800"
                         >
                             Manage Candidates
                         </Link>

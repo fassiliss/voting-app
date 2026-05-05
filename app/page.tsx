@@ -15,7 +15,7 @@ export default function VotingPage() {
     const [voterName, setVoterName] = useState('');
     const [voterEmail, setVoterEmail] = useState('');
     const [candidates, setCandidates] = useState<Candidate[]>([]);
-    const [selectedCandidates, setSelectedCandidates] = useState<number[]>([]);
+    const [selectedCandidateId, setSelectedCandidateId] = useState<number | null>(null);
     const [step, setStep] = useState<'login' | 'vote'>('login');
     const [voterId, setVoterId] = useState<number | null>(null);
     const [submitting, setSubmitting] = useState(false);
@@ -29,15 +29,22 @@ export default function VotingPage() {
     useEffect(() => {
         // Get device fingerprint only on client side
         if (typeof window !== 'undefined') {
-            const fp = getDeviceFingerprint();
-            setDeviceFingerprint(fp);
+            getDeviceFingerprint()
+                .then(setDeviceFingerprint)
+                .catch(() => setError('Unable to verify this device. Please refresh and try again.'));
         }
     }, []);
+
     const fetchCandidates = async () => {
         const { data, error } = await supabase
             .from('candidates')
-            .select('*')
+            .select('id, name, position')
             .order('id');
+
+        if (error) {
+            setError('Unable to load candidates. Please try again later.');
+            return;
+        }
 
         if (data) setCandidates(data);
     };
@@ -46,9 +53,16 @@ export default function VotingPage() {
         e.preventDefault();
         setError('');
 
-        // Validate email format
+        const cleanName = voterName.trim();
+        const cleanEmail = voterEmail.trim().toLowerCase();
+
+        if (cleanName.length < 2) {
+            setError('Please enter your full name.');
+            return;
+        }
+
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(voterEmail)) {
+        if (!emailRegex.test(cleanEmail)) {
             setError('Please enter a valid email address (e.g., name@example.com)');
             return;
         }
@@ -62,7 +76,7 @@ export default function VotingPage() {
         // Check if this device has already voted
         const { data: deviceCheck } = await supabase
             .from('voters')
-            .select('*')
+            .select('id')
             .eq('device_fingerprint', deviceFingerprint)
             .eq('has_voted', true)
             .single();
@@ -75,8 +89,8 @@ export default function VotingPage() {
         // Check if email already voted
         const { data: existingVoter } = await supabase
             .from('voters')
-            .select('*')
-            .eq('voter_email', voterEmail)
+            .select('id, has_voted')
+            .eq('voter_email', cleanEmail)
             .single();
 
         if (existingVoter?.has_voted) {
@@ -87,58 +101,65 @@ export default function VotingPage() {
         // Create or update voter
         if (existingVoter) {
             // Update existing voter with device fingerprint
-            await supabase
+            const { error: updateVoterError } = await supabase
                 .from('voters')
                 .update({ device_fingerprint: deviceFingerprint })
                 .eq('id', existingVoter.id);
 
+            if (updateVoterError) {
+                setError(updateVoterError.message);
+                return;
+            }
+
             setVoterId(existingVoter.id);
         } else {
             // Create new voter with device fingerprint
-            const { data: newVoter, error } = await supabase
+            const { data: newVoter, error: newVoterError } = await supabase
                 .from('voters')
                 .insert([{
-                    voter_name: voterName,
-                    voter_email: voterEmail,
+                    voter_name: cleanName,
+                    voter_email: cleanEmail,
                     device_fingerprint: deviceFingerprint
                 }])
-                .select()
+                .select('id')
                 .single();
 
-            if (newVoter) setVoterId(newVoter.id);
+            if (newVoterError) {
+                setError(newVoterError.message);
+                return;
+            }
+
+            if (newVoter?.id) setVoterId(newVoter.id);
         }
 
         setStep('vote');
     };
 
-    const handleCheckboxChange = (candidateId: number) => {
-        if (selectedCandidates.includes(candidateId)) {
-            // Remove from selection
-            setSelectedCandidates(selectedCandidates.filter(id => id !== candidateId));
-        } else {
-            // Add to selection (limit to 1 candidate only)
-            setSelectedCandidates([...selectedCandidates, candidateId]);
-        }
+    const handleCandidateSelect = (candidateId: number) => {
+        setSelectedCandidateId(candidateId);
     };
 
     const handleSubmitVote = async () => {
         setError('');
 
-        // Check if at least one candidate is selected
-        if (selectedCandidates.length === 0) {
-            setError('Please select at least one candidate!');
+        if (!selectedCandidateId) {
+            setError('Please select a candidate.');
+            return;
+        }
+
+        if (!voterId) {
+            setError('Your voter session could not be verified. Please start again.');
             return;
         }
 
         setSubmitting(true);
 
         try {
-            // Insert votes with sequential ranks
-            const votesData = selectedCandidates.map((candidateId, index) => ({
+            const votesData = [{
                 voter_id: voterId,
-                candidate_id: candidateId,
-                rank: index + 1, // Sequential ranks: 1, 2, 3, etc.
-            }));
+                candidate_id: selectedCandidateId,
+                rank: 1,
+            }];
 
             const { error: votesError } = await supabase
                 .from('votes')
@@ -147,65 +168,70 @@ export default function VotingPage() {
             if (votesError) throw votesError;
 
             // Mark voter as voted
-            await supabase
+            const { error: voterError } = await supabase
                 .from('voters')
                 .update({ has_voted: true, voted_at: new Date().toISOString() })
                 .eq('id', voterId);
 
+            if (voterError) throw voterError;
+
             // Redirect to results
             router.push('/results');
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'Unable to submit your vote.';
+            setError(message);
         } finally {
             setSubmitting(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-12 px-4">
+        <div className="min-h-screen bg-slate-50 py-10 px-4">
             <div className="max-w-4xl mx-auto">
 
                 {step === 'login' && (
-                    <div className="bg-white rounded-lg shadow-xl p-8">
-                        <h1 className="text-4xl font-bold text-center mb-2" style={{ color: '#000000' }}>Voting System</h1>
-                        <p className="text-center text-gray-900 mb-8 font-semibold">Enter your details to vote</p>
+                    <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 md:p-8">
+                        <h1 className="text-3xl font-bold text-center mb-2 text-slate-950">Voting System</h1>
+                        <p className="text-center text-slate-600 mb-8">Enter your details to begin.</p>
 
                         {error && (
-                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 font-semibold">
+                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4 font-medium">
                                 {error}
                             </div>
                         )}
 
                         <form onSubmit={handleLogin} className="space-y-6">
                             <div>
-                                <label className="block font-bold mb-2 text-lg" style={{ color: '#000000' }}>Full Name *</label>
+                                <label className="block font-bold mb-2 text-slate-950" htmlFor="voter-name">Full Name *</label>
                                 <input
+                                    id="voter-name"
                                     type="text"
                                     value={voterName}
-                                    onChange={(e) => setVoterName(e.target.value)}
+                                    onChange={(e) => setVoterName(e.currentTarget.value)}
                                     required
-                                    className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent font-bold bg-white"
-                                    style={{ color: '#000000' }}
+                                    maxLength={120}
+                                    className="w-full px-4 py-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none text-slate-950 bg-white"
                                     placeholder="Enter your name"
                                 />
                             </div>
 
                             <div>
-                                <label className="block font-bold mb-2 text-lg" style={{ color: '#000000' }}>Email *</label>
+                                <label className="block font-bold mb-2 text-slate-950" htmlFor="voter-email">Email *</label>
                                 <input
+                                    id="voter-email"
                                     type="email"
                                     value={voterEmail}
-                                    onChange={(e) => setVoterEmail(e.target.value)}
+                                    onChange={(e) => setVoterEmail(e.currentTarget.value)}
                                     required
-                                    className="w-full px-4 py-3 border-2 border-gray-400 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent font-bold bg-white"
-                                    style={{ color: '#000000' }}
+                                    maxLength={160}
+                                    className="w-full px-4 py-3 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none text-slate-950 bg-white"
                                     placeholder="your@email.com"
                                 />
                             </div>
 
                             <button
                                 type="submit"
-                                className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold text-lg hover:bg-blue-700 transition"
+                                className="w-full bg-blue-600 text-white py-3 rounded-md font-bold text-lg hover:bg-blue-700 transition"
                             >
                                 Continue to Vote
                             </button>
@@ -214,52 +240,54 @@ export default function VotingPage() {
                 )}
 
                 {step === 'vote' && (
-                    <div className="bg-white rounded-lg shadow-xl p-8">
-                        <h1 className="text-4xl font-bold text-center mb-2" style={{ color: '#000000' }}>Select Your Candidate</h1>
-                        <p className="text-center mb-8 font-semibold text-lg" style={{ color: '#000000' }}>
-                            Check the box next to your preferred candidate
+                    <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 md:p-8">
+                        <h1 className="text-3xl font-bold text-center mb-2 text-slate-950">Select Your Candidate</h1>
+                        <p className="text-center mb-8 text-slate-600">
+                            Choose one candidate and submit your vote.
                         </p>
 
                         {error && (
-                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 font-semibold">
+                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4 font-medium">
                                 {error}
                             </div>
                         )}
 
                         <div className="space-y-4 mb-8">
                             {candidates.map((candidate) => (
-                                <div
+                                <button
+                                    type="button"
                                     key={candidate.id}
-                                    className={`flex items-center gap-4 p-6 border-2 rounded-lg cursor-pointer transition ${
-                                        selectedCandidates.includes(candidate.id)
+                                    className={`w-full text-left flex items-center gap-4 p-5 border rounded-lg transition ${
+                                        selectedCandidateId === candidate.id
                                             ? 'border-blue-500 bg-blue-50'
-                                            : 'border-gray-300 bg-gray-50 hover:border-blue-400'
+                                            : 'border-slate-200 bg-white hover:border-blue-400'
                                     }`}
-                                    onClick={() => handleCheckboxChange(candidate.id)}
+                                    onClick={() => handleCandidateSelect(candidate.id)}
                                 >
                                     <input
-                                        type="checkbox"
-                                        checked={selectedCandidates.includes(candidate.id)}
-                                        onChange={() => handleCheckboxChange(candidate.id)}
-                                        className="w-8 h-8 cursor-pointer"
+                                        type="radio"
+                                        name="candidate"
+                                        checked={selectedCandidateId === candidate.id}
+                                        onChange={() => handleCandidateSelect(candidate.id)}
+                                        className="w-6 h-6 cursor-pointer"
                                     />
                                     <div className="flex-1">
-                                        <h3 className="text-3xl font-black" style={{ color: '#000000' }}>{candidate.name}</h3>
-                                        <p className="text-lg font-semibold" style={{ color: '#1a1a1a' }}>{candidate.position}</p>
+                                        <h3 className="text-2xl font-bold text-slate-950">{candidate.name}</h3>
+                                        <p className="text-slate-600 font-medium">{candidate.position || 'Candidate'}</p>
                                     </div>
-                                    {selectedCandidates.includes(candidate.id) && (
-                                        <div className="text-blue-600 font-bold text-xl">✓ Selected</div>
+                                    {selectedCandidateId === candidate.id && (
+                                        <div className="text-blue-600 font-bold">Selected</div>
                                     )}
-                                </div>
+                                </button>
                             ))}
                         </div>
 
                         <button
                             onClick={handleSubmitVote}
-                            disabled={submitting || selectedCandidates.length === 0}
-                            className="w-full bg-blue-600 text-white py-4 rounded-lg font-bold text-xl hover:bg-blue-700 transition disabled:bg-gray-400"
+                            disabled={submitting || !selectedCandidateId}
+                            className="w-full bg-blue-600 text-white py-4 rounded-md font-bold text-xl hover:bg-blue-700 transition disabled:bg-slate-400"
                         >
-                            {submitting ? 'Submitting Vote...' : `Submit Vote${selectedCandidates.length > 0 ? ` (${selectedCandidates.length} selected)` : ''}`}
+                            {submitting ? 'Submitting Vote...' : 'Submit Vote'}
                         </button>
                     </div>
                 )}
